@@ -1,0 +1,68 @@
+# #My backend structure will cover schemas for essentials aspects like memberships, events, communication and transactions.
+
+# #Schemas (Memberships, Events, Communications, Transactions)
+
+# #MemberSchema 
+#     . Name {type: String, required}
+#     . email {type: string, validation, required}
+#     . password {type: string, required }
+#     . role {type: string, enum: ['member', 'admin'], default: 'member'}
+#     . joinedAt: {type: date, default: date.now}
+
+# #EventSchema 
+#     . title: {type: string}
+#     . description: {type: string}
+#     . date: {type: date, required}
+#     . location: string
+
+# #TransactionSchema
+#     . member: {type: mongoose.Schemas.Types.ObjectId, ref: 'Member'}
+#     . amount: {type: Number, required}
+#     . type: {type: string, enum: ['Membership card fee', 'Donation'], required}
+#     . timestamp: {type: Date, default: Date.now}
+
+# # CommunicationSchema
+#     . title: {type: string, required}
+#     . content: {type: string, required}
+#     . createdAt: {type: Date, default: Date.now}
+
+
+# #Backend Routes (* Full CRUD on all Schema)
+
+# #MembersRoutes
+#     . Post
+#     . Get
+#     . Update
+#     . Delete
+
+# #EventsRoutes
+#     . Post
+#     . Get
+#     . Update
+#     . Delete
+
+# # TransactionsRoutes
+#     . Post
+#     . Get
+#     . Update
+#     . Delete
+
+# #CommunicationsRoutes
+#     . Post
+#     . Get
+#     . Update
+#     . Delete
+
+# # Authentication
+#     . JWT
+#     . BCRYPT
+
+# #Controllers
+#     . MemberControllers
+#     . TransactionControllers
+                                                                                
+# #Middleware
+#     . Auth
+#     . AuthAdmin
+    
+
