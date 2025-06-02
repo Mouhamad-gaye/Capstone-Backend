@@ -19,7 +19,7 @@ let register = async (req, res) => {
             return res.status(400).json({msg: "Email already exist"})
    
         }
-        member = new Members({name, email, password});
+        member = new Members({name, email, password, isAdmin: true});
         const salt = await bcrypt.genSalt(10)
 
         member.password = await bcrypt.hash(password, salt);
