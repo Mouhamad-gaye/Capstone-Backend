@@ -4,6 +4,7 @@ import connectDB from './db/conn.mjs';
 import globalError from './middleware/globalError.mjs';
 import cors from 'cors';
 import morgan from 'morgan';
+import membersRoutes from './routes/membersRoutes.mjs'
 
 
 
@@ -20,6 +21,7 @@ app.use(morgan("tiny"));
 
 
 //Routes
+app.use('/api/member', membersRoutes)
 
 
 //Err Middleware
