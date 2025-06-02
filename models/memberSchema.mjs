@@ -8,4 +8,4 @@ const memberSchema = new mongoose.Schema({
     joinedAt: {type: date, default: date.now}
 });
 
-export default mongoose.model("Member", memberSchema);
+export default mongoose.model("Members", memberSchema);
