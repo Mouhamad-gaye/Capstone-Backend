@@ -3,13 +3,44 @@ import eventData from '../utilities/eventData.mjs'
 import Events from '../models/eventSchema.mjs'
 import auth from '../middleware/auth.mjs';
 import adminAuth from '../middleware/adminAuth.mjs';
+import jwt from 'jsonwebtoken'
+
 
 const router = express.Router();
 
-//Create
-router.post('/', async (req, res) => {
-    let newEvent = await Events.create(req.body);
-    res.json(newEvent);
+
+router.post('/',auth, adminAuth, async (req, res) => {
+   
+   try {
+    const {title, description, date, location} = req.body;
+    if(!title || !date || !location) {
+        return res.status(400).json({msg: "All fields are required"})
+    }
+
+    const newEvent = await Events.create(eventData);
+    res.send(newEvent)
+    await newEvent.save();
+    res.status(201).json({msg: "Event created succesfully"})
+
+
+    const payload = {
+                member: {
+                    id: member._id
+                }
+            };
+    
+            jwt.sign(
+                payload, process.env.jwtSecret, (err, token) => {
+                    if(err) throw err;
+    
+                    res.status(201).json({token});
+                }
+            ); 
+
+   } catch(err) {
+        console.error(err)
+        res.status(500).json({msg: "Server error"})
+   }
 });
 
 router.get('/seed', async (req, res) => {
@@ -23,21 +54,85 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/:id', auth, adminAuth, async (req, res) => {
-    const updatedEvent = await Events.findByIdAndUpdate(req.params.id, req.body, {new: true});
+   try {
+
+    if(!req.member || !req.member.isAdmin) {
+        return res.status(403).json({msg: "Unauthorized: Admin access required"})
+    };
+
+    const updatedEvent = await Events.findById(req.params.id);
     if(!updatedEvent) {
-        res.status(400).json({msg: "Event not found"})
-    } else {
-        res.json(updatedEvent)
-    }
+        return res.status(400).json({msg: "Event not found"})
+    } 
+
+    //Update event fields if provided
+    if(req.body.title) updatedEvent.title = req.body.title;
+    if(req.body.description) updatedEvent.description = req.body.description;
+    if(req.body.date) updatedEvent.date = req.body.date;
+    if(req.body.location) updatedEvent.location = req.body.location;
+
+    await updatedEvent.save();
+    res.status(200).json({msg: "Event updated successfully"});
+
+    const payload = {
+                member: {
+                    id: member._id
+                }
+            };
+    
+            jwt.sign(
+                payload, process.env.jwtSecret, (err, token) => {
+                    if(err) throw err;
+    
+                    res.status(201).json({token});
+                }
+            );
+
+   }catch(err) {
+    console.error(err)
+    res.status(500).json({msg: "Server error"})
+   }
 });
 
 router.delete('/:id', auth, adminAuth, async (req, res) => {
-    const deletedEvent = await Events.findByIdAndDelete(req.params.id, req.body, {new: true});
-    if(!deletedEvent) {
-        res.status(400).json({msg: "Event not found"})
-    } else {
-        res.json(deletedEvent)
-    }
+    try {
+
+        if(!req.member || !req.member.isAdmin) {
+            return res.status(403).json({msg: "Unauthorized: Admin access required"})
+        };
+    
+        const deletedEvent = await Events.findById(req.params.id);
+        if(!deletedEvent) {
+            return res.status(400).json({msg: "Event not found"})
+        } 
+    
+        //Update event fields if provided
+        if(req.body.title) deletedEvent.title = req.body.title;
+        if(req.body.description) deletedEvent.description = req.body.description;
+        if(req.body.date) deletedEvent.date = req.body.date;
+        if(req.body.location) deletedEvent.location = req.body.location;
+    
+        await deletedEvent.save();
+        res.status(200).json({msg: "Event deleted successfully"});
+
+        const payload = {
+                    member: {
+                        id: member._id
+                    }
+                };
+        
+                jwt.sign(
+                    payload, process.env.jwtSecret, (err, token) => {
+                        if(err) throw err;
+        
+                        res.status(201).json({token});
+                    }
+                );
+    
+       }catch(err) {
+        console.error(err)
+        res.status(500).json({msg: "Server error"})
+       }
 });
 
 export default router

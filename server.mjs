@@ -6,6 +6,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import membersRoutes from './routes/membersRoutes.mjs'
 import eventsRoutes from './routes/eventsRoutes.mjs'
+import communicationsRoutes from './routes/communicationsRoute.mjs'
 
 
 
@@ -23,7 +24,8 @@ app.use(morgan("tiny"));
 
 //Routes
 app.use('/api/member', membersRoutes);
-app.use('/api/event', eventsRoutes)
+app.use('/api/event', eventsRoutes);
+app.use('/api/comm', communicationsRoutes)
 
 
 //Err Middleware
