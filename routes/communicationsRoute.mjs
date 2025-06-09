@@ -1,5 +1,5 @@
 import express from 'express'
-import dotenv from dotenv
+import dotenv from 'dotenv'
 import Comm from '../models/communicationSchema.mjs'
 import auth from '../middleware/auth.mjs';
 import adminAuth from '../middleware/adminAuth.mjs';

@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 
 const communicationSchema = new mongoose.Schema({
-    title: {type: string, required: true},
-    content: {type: string, required: true},
+    title: {type: String, required: true},
+    content: {type: String, required: true},
     createdAt: {type: Date, default: Date.now},
     createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "Member", required: true}
 });
 
-export default model.mongoose("Communication", communicationSchema);
+export default mongoose.model("Communication", communicationSchema);

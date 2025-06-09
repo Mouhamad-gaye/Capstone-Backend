@@ -8,6 +8,7 @@ const memberSchema = new mongoose.Schema({
     DateOfBirth: {type: Date, required: false},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
+    role: {type: String, enum: ["admin", "member"], default: "member"},
     isAdmin: {type: Boolean, default: false}
     
 });

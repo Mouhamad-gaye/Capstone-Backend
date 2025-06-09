@@ -1,21 +1,23 @@
-import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-export default function (req, res, next) {
-    let token = req.header('token')
+export default function authMiddleware(req, res, next) {
+    let token = req.header("Authorization"); 
 
-    if(!token) {
-        res.status(401).json({msg: "Authorization Denied"});
+    if (!token) {
+        return res.status(401).json({ msg: "Authorization Denied" }); 
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.jwtSecret);
-        req.member = decoded.member.id
+        token = token.replace("Bearer ", ""); 
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); 
+
+        req.member = decoded.id; 
         next();
-    } catch(err) {
-        console.error(err.message)
-        res.status(401).json({msg: "Invalid token"})
+    } catch (err) {
+        console.error("Token verification error:", err.message);
+        return res.status(401).json({ msg: "Invalid token" });
     }
 }

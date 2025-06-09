@@ -15,7 +15,7 @@ const router = express.Router()
 
 //Register Route
 
-router.post('/', [
+router.post('/register', [
     check('firstName', 'Name is required').not().isEmpty(),
     check('lastName', 'Name is required').not().isEmpty(),
     check('email', 'Provide a valid email').isEmail(),
@@ -74,7 +74,7 @@ async (req, res) => {
 
 //Login route
 
-router.post('/', [
+router.post('/login', [
     check("email", "Please enter valid email").isEmail,
     check("password", "Paswword required").not().isEmpty()
 ], 
@@ -123,7 +123,7 @@ async (req, res) => {
 
 //Get member info route
 
-router.get('/', auth, adminAuth, async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         let member = await Members.findById(req.member.id).select("-password");
         res.json(member)
