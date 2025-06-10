@@ -51,9 +51,35 @@ async (req, res) => {
 
         res.status(201).json({msg: "Member created successfully", member});
 
+      
+
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({errors: [{msg: "Server error"}] });
+    }
+
+});
+
+
+
+
+router.post('/admin-register', async (req, res) => {
+    try {
+        const {firstName, lastName, email, password} = req.body;
+
+        const existingMember = await Members.findOne({email});
+        if(existingMember) return res.status(400).json({msg: "Email already exists"});
+
+        const newAdmin = new Members({firstName, lastName, email, password, role: "admin"})
+
+        const salt = await bcrypt.genSalt(10)
+        newAdmin.password = await bcrypt.hash(password, salt);
+
+        await newAdmin.save();
+
         const payload = {
             member: {
-                id: member._id
+                id: newAdmin._id
             }
         };
 
@@ -64,13 +90,16 @@ async (req, res) => {
                 res.status(201).json({token});
             }
         );
+        
 
     } catch(err) {
-        console.error(err);
-        res.status(500).json({errors: [{msg: "Server error"}] });
+        console.error(err)
+        res.status(500).json({msg: "Server error"})
     }
-
 });
+
+
+
 
 //Login route
 
@@ -105,25 +134,17 @@ async (req, res) => {
             return res.status(400).json({errors: [{msg: "Invalid credentials"}]});
         }
 
-        const payload = {
-            member: {
-                id: member._id
-            }
-        };
-
-        jwt.sign(payload, process.env.jwtSecret, {expiresIn: "1h"}, (err, token) => {
-            if(err) throw err;
-            res.json({token});
-        });
     } catch(err) {
         console.error(err)
         res.status(500).json({errors: [{msg: "Server Error"}]})
     }
 });
 
+
+
 //Get member info route
 
-router.get('/', auth, async (req, res) => {
+router.get('/', adminAuth, async (req, res) => {
     try {
         let member = await Members.findById(req.member.id).select("-password");
         res.json(member)

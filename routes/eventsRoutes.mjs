@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 const router = express.Router();
 
 
-router.post('/',auth, adminAuth, async (req, res) => {
+router.post('/', adminAuth, async (req, res) => {
    
    try {
     const {title, description, date, location} = req.body;
@@ -23,19 +23,19 @@ router.post('/',auth, adminAuth, async (req, res) => {
     res.status(201).json({msg: "Event created succesfully"})
 
 
-    const payload = {
-                member: {
-                    id: member._id
-                }
-            };
+    // const payload = {
+    //             member: {
+    //                 id: member._id
+    //             }
+    //         };
     
-            jwt.sign(
-                payload, process.env.jwtSecret, (err, token) => {
-                    if(err) throw err;
+    //         jwt.sign(
+    //             payload, process.env.jwtSecret, (err, token) => {
+    //                 if(err) throw err;
     
-                    res.status(201).json({token});
-                }
-            ); 
+    //                 res.status(201).json({token});
+    //             }
+    //         ); 
 
    } catch(err) {
         console.error(err)
@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
     res.json(allEvent);
 });
 
-router.put('/:id', auth, adminAuth, async (req, res) => {
+router.put('/:id', adminAuth, async (req, res) => {
    try {
 
     if(!req.member || !req.member.isAdmin) {
@@ -74,19 +74,19 @@ router.put('/:id', auth, adminAuth, async (req, res) => {
     await updatedEvent.save();
     res.status(200).json({msg: "Event updated successfully"});
 
-    const payload = {
-                member: {
-                    id: member._id
-                }
-            };
+    // const payload = {
+    //             member: {
+    //                 id: member._id
+    //             }
+    //         };
     
-            jwt.sign(
-                payload, process.env.jwtSecret, (err, token) => {
-                    if(err) throw err;
+    //         jwt.sign(
+    //             payload, process.env.jwtSecret, (err, token) => {
+    //                 if(err) throw err;
     
-                    res.status(201).json({token});
-                }
-            );
+    //                 res.status(201).json({token});
+    //             }
+    //         );
 
    }catch(err) {
     console.error(err)
@@ -94,7 +94,7 @@ router.put('/:id', auth, adminAuth, async (req, res) => {
    }
 });
 
-router.delete('/:id', auth, adminAuth, async (req, res) => {
+router.delete('/:id', adminAuth, async (req, res) => {
     try {
 
         if(!req.member || !req.member.isAdmin) {
@@ -115,19 +115,19 @@ router.delete('/:id', auth, adminAuth, async (req, res) => {
         await deletedEvent.save();
         res.status(200).json({msg: "Event deleted successfully"});
 
-        const payload = {
-                    member: {
-                        id: member._id
-                    }
-                };
+        // const payload = {
+        //             member: {
+        //                 id: member._id
+        //             }
+        //         };
         
-                jwt.sign(
-                    payload, process.env.jwtSecret, (err, token) => {
-                        if(err) throw err;
+        //         jwt.sign(
+        //             payload, process.env.jwtSecret, (err, token) => {
+        //                 if(err) throw err;
         
-                        res.status(201).json({token});
-                    }
-                );
+        //                 res.status(201).json({token});
+        //             }
+        //         );
     
        }catch(err) {
         console.error(err)

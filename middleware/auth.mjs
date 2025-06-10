@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export default function authMiddleware(req, res, next) {
+export default function auth(req, res, next) {
     let token = req.header("Authorization"); 
 
     if (!token) {

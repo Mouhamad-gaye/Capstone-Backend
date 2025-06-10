@@ -9,7 +9,7 @@ export default async function (req, res, next) {
 
     }
 
-    if(member.isAdmin) {
+    if(member.role) {
         next();
     } else {
         return res.status(401).json({msg: "No Admin priviliges"})
