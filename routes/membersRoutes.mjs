@@ -104,7 +104,7 @@ router.post('/admin-register', async (req, res) => {
 //Login route
 
 router.post('/login', [
-    check("email", "Please enter valid email").isEmail,
+    check("email", "Please enter valid email").isEmail(),
     check("password", "Paswword required").not().isEmpty()
 ], 
 
@@ -132,13 +132,52 @@ async (req, res) => {
         const isMatch = await bcrypt.compare(password, member.password);
         if(!isMatch) {
             return res.status(400).json({errors: [{msg: "Invalid credentials"}]});
-        }
+        };
+        const payload = {
+            member: {
+                id: member._id
+            }
+        };
+
+        jwt.sign(
+            payload, process.env.JWT_SECRET, {expiresIn: "1h"}, (err, token) => {
+                if(err) throw err;
+
+                res.status(201).json({token});
+            }
+        );
 
     } catch(err) {
         console.error(err)
         res.status(500).json({errors: [{msg: "Server Error"}]})
     }
 });
+
+
+router.post('/admin-login', async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        const admin = await Members.findOne({email, role: "admin"});
+        if(!admin) 
+            return res.status(401).json({msg: "Admin not found"});
+
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if(!isMatch) 
+            return res.status(401).json({msg: "Invalid credentials"})
+
+        jwt.sign(
+            {id: admin._id, role: admin.role}, process.env.JWT_SECRET, {expiresIn: "1h"}, (err, token) => {
+                if(err) throw err;
+
+                res.json({msg: "Admin login successfully", token, role: admin.role})
+            }
+        );
+
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({msg: "Server error"})
+    }
+})
 
 
 
