@@ -63,17 +63,22 @@ async (req, res) => {
 
 
 
-router.post('/admin-register', async (req, res) => {
+router.post('/admin-register', adminAuth, async (req, res) => {
     try {
         const {firstName, lastName, email, password} = req.body;
 
-        const existingMember = await Members.findOne({email});
-        if(existingMember) return res.status(400).json({msg: "Email already exists"});
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({ error: "All fields are required" });
+        };
 
-        const newAdmin = new Members({firstName, lastName, email, password, role: "admin"})
+        const existingMember = await Members.findOne({email});
+        if(existingMember) 
+            return res.status(400).json({msg: "Email already exists"});
 
         const salt = await bcrypt.genSalt(10)
-        newAdmin.password = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newAdmin = new Members({firstName, lastName, email, password: hashedPassword, role: "admin"})
 
         await newAdmin.save();
 
@@ -84,10 +89,12 @@ router.post('/admin-register', async (req, res) => {
         };
 
         jwt.sign(
-            payload, process.env.jwtSecret, {expiresIn: "1h"}, (err, token) => {
+            payload, process.env.JWT_SECRET, {expiresIn: "1h"}, (err, token) => {
                 if(err) throw err;
 
-                res.status(201).json({token});
+                res.status(201).json({msg: "Admin registered successfully", token, newAdmin: {firstName: newAdmin.firstName, lastName: newAdmin.lastName, email: newAdmin.email }});
+
+                
             }
         );
         
@@ -143,7 +150,7 @@ async (req, res) => {
             payload, process.env.JWT_SECRET, {expiresIn: "1h"}, (err, token) => {
                 if(err) throw err;
 
-                res.status(201).json({token});
+                res.status(201).json({msg: "Login Successfully", token, member: {firstName: member.firstName, lastName: member.lastName, email: member.email}});
             }
         );
 
@@ -154,7 +161,7 @@ async (req, res) => {
 });
 
 
-router.post('/admin-login', async (req, res) => {
+router.post('/admin-login', adminAuth, async (req, res) => {
     try {
         const {email, password} = req.body;
         const admin = await Members.findOne({email, role: "admin"});
@@ -165,11 +172,18 @@ router.post('/admin-login', async (req, res) => {
         if(!isMatch) 
             return res.status(401).json({msg: "Invalid credentials"})
 
+
+        const payload = {
+            member: {
+                id: admin._id,
+                role: admin.role
+            }
+        };
         jwt.sign(
-            {id: admin._id, role: admin.role}, process.env.JWT_SECRET, {expiresIn: "1h"}, (err, token) => {
+            payload, process.env.JWT_SECRET, {expiresIn: "1h"}, (err, token) => {
                 if(err) throw err;
 
-                res.json({msg: "Admin login successfully", token, role: admin.role})
+                res.json({msg: "Admin login successfully", token, admin: {firstName: admin.firstName, role: admin.role}})
             }
         );
 

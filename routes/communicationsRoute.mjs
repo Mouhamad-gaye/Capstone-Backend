@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 dotenv.config();
 const router = express.Router();
 
-router.post('/', auth, adminAuth, async (req, res) => {
+router.post('/', adminAuth, async (req, res) => {
     try {
         const {title, content} = req.body;
 

@@ -13,29 +13,13 @@ router.post('/', adminAuth, async (req, res) => {
    
    try {
     const {title, description, date, location} = req.body;
-    if(!title || !date || !location) {
+    if(!title || !description || !date || !location) {
         return res.status(400).json({msg: "All fields are required"})
     }
 
-    const newEvent = await Events.create(eventData);
-    res.send(newEvent)
+    const newEvent = new Events({title, description, date, location})
     await newEvent.save();
-    res.status(201).json({msg: "Event created succesfully"})
-
-
-    // const payload = {
-    //             member: {
-    //                 id: member._id
-    //             }
-    //         };
-    
-    //         jwt.sign(
-    //             payload, process.env.jwtSecret, (err, token) => {
-    //                 if(err) throw err;
-    
-    //                 res.status(201).json({token});
-    //             }
-    //         ); 
+    res.status(201).json({msg: "Event created succesfully", newEvent})
 
    } catch(err) {
         console.error(err)
@@ -43,10 +27,10 @@ router.post('/', adminAuth, async (req, res) => {
    }
 });
 
-router.get('/seed', async (req, res) => {
-    await Events.create(eventData)
-    res.send('Seeded Data')
-})
+// router.get('/seed', async (req, res) => {
+//     await Events.create(eventData)
+//     res.send('Seeded Data')
+// })
 
 router.get('/', async (req, res) => {
     let allEvent = await Events.find(req.body);
@@ -74,19 +58,6 @@ router.put('/:id', adminAuth, async (req, res) => {
     await updatedEvent.save();
     res.status(200).json({msg: "Event updated successfully"});
 
-    // const payload = {
-    //             member: {
-    //                 id: member._id
-    //             }
-    //         };
-    
-    //         jwt.sign(
-    //             payload, process.env.jwtSecret, (err, token) => {
-    //                 if(err) throw err;
-    
-    //                 res.status(201).json({token});
-    //             }
-    //         );
 
    }catch(err) {
     console.error(err)
@@ -114,20 +85,6 @@ router.delete('/:id', adminAuth, async (req, res) => {
     
         await deletedEvent.save();
         res.status(200).json({msg: "Event deleted successfully"});
-
-        // const payload = {
-        //             member: {
-        //                 id: member._id
-        //             }
-        //         };
-        
-        //         jwt.sign(
-        //             payload, process.env.jwtSecret, (err, token) => {
-        //                 if(err) throw err;
-        
-        //                 res.status(201).json({token});
-        //             }
-        //         );
     
        }catch(err) {
         console.error(err)
