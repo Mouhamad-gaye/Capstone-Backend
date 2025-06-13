@@ -9,12 +9,12 @@ export default function auth(req, res, next) {
     if (!token) {
         return res.status(401).json({ msg: "Authorization Denied" }); 
     }
-
+    
     try {
-        token = token.replace("Bearer ", ""); 
+        // token = token.replace("Bearer ", ""); 
         const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-
-        req.member = decoded.id; 
+       
+        req.member = decoded.member.id; 
         next();
     } catch (err) {
         console.error("Token verification error:", err.message);

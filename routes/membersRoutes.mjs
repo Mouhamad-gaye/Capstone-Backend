@@ -197,9 +197,9 @@ router.post('/admin-login', adminAuth, async (req, res) => {
 
 //Get member info route
 
-router.get('/', adminAuth, async (req, res) => {
+router.get('/', auth, adminAuth, async (req, res) => {
     try {
-        let member = await Members.findById(req.member.id).select("-password");
+        let member = await Members.findById(req.member).select("-password");
         res.json(member)
     } catch (err) {
         console.error(err)

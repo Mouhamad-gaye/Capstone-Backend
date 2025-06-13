@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 const router = express.Router();
 
 
-router.post('/', adminAuth, async (req, res) => {
+router.post('/',auth, adminAuth,  async (req, res) => {
    
    try {
     const {title, description, date, location} = req.body;
@@ -17,7 +17,7 @@ router.post('/', adminAuth, async (req, res) => {
         return res.status(400).json({msg: "All fields are required"})
     }
 
-    const newEvent = new Events({title, description, date, location})
+    const newEvent = new Events({title, description, date: new Date(date), location})
     await newEvent.save();
     res.status(201).json({msg: "Event created succesfully", newEvent})
 
@@ -27,69 +27,67 @@ router.post('/', adminAuth, async (req, res) => {
    }
 });
 
-// router.get('/seed', async (req, res) => {
-//     await Events.create(eventData)
-//     res.send('Seeded Data')
-// })
+router.get('/seed', async (req, res) => {
+    await Events.create(eventData)
+    res.send('Seeded Data')
+})
 
 router.get('/', async (req, res) => {
-    let allEvent = await Events.find(req.body);
-    res.json(allEvent);
-});
-
-router.put('/:id', adminAuth, async (req, res) => {
-   try {
-
-    if(!req.member || !req.member.isAdmin) {
-        return res.status(403).json({msg: "Unauthorized: Admin access required"})
-    };
-
-    const updatedEvent = await Events.findById(req.params.id);
-    if(!updatedEvent) {
-        return res.status(400).json({msg: "Event not found"})
-    } 
-
-    //Update event fields if provided
-    if(req.body.title) updatedEvent.title = req.body.title;
-    if(req.body.description) updatedEvent.description = req.body.description;
-    if(req.body.date) updatedEvent.date = req.body.date;
-    if(req.body.location) updatedEvent.location = req.body.location;
-
-    await updatedEvent.save();
-    res.status(200).json({msg: "Event updated successfully"});
-
-
-   }catch(err) {
-    console.error(err)
-    res.status(500).json({msg: "Server error"})
-   }
-});
-
-router.delete('/:id', adminAuth, async (req, res) => {
     try {
-
-        if(!req.member || !req.member.isAdmin) {
-            return res.status(403).json({msg: "Unauthorized: Admin access required"})
-        };
-    
-        const deletedEvent = await Events.findById(req.params.id);
-        if(!deletedEvent) {
-            return res.status(400).json({msg: "Event not found"})
-        } 
-    
-        //Update event fields if provided
-        if(req.body.title) deletedEvent.title = req.body.title;
-        if(req.body.description) deletedEvent.description = req.body.description;
-        if(req.body.date) deletedEvent.date = req.body.date;
-        if(req.body.location) deletedEvent.location = req.body.location;
-    
-        await deletedEvent.save();
-        res.status(200).json({msg: "Event deleted successfully"});
-    
-       }catch(err) {
+        let allEvent = await Events.find();
+    res.json(allEvent);
+    } catch (err) {
         console.error(err)
         res.status(500).json({msg: "Server error"})
-       }
+
+    }
 });
+
+router.put('/:id',auth, adminAuth, async (req, res) => {
+    try {
+        // Validate request body
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({ msg: "No update data provided" });
+        }
+
+        // Update the event
+        const updatedEvent = await Events.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+
+        if (!updatedEvent) {
+            return res.status(404).json({ msg: "Event not found" });
+        }
+
+        res.status(200).json({ msg: "Event updated successfully", updatedEvent });
+    } catch (err) {
+        console.error("Error updating event:", err);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+router.delete('/:id',auth, adminAuth,  async (req, res) => {
+    const { id } = req.params;  
+    console.log("Received Event ID:", id);
+
+    if (!id) {
+        return res.status(400).json({ msg: "Invalid event ID" });
+    }
+
+    try {
+        const deletedEvent = await Events.findByIdAndDelete(id);
+        if (!deletedEvent) {
+            return res.status(404).json({ msg: "Event not found" });
+        }
+
+        res.status(200).json({ msg: "Event deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting event:", err);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+
+
+
+
 
 export default router
