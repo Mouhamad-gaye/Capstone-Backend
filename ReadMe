@@ -1,6 +1,8 @@
-# #My backend structure will cover schemas for essentials aspects like memberships, events, communication and transactions.
+##the backend implementation for the Capstone Project, provides API endpoints for authentication, event management, user roles, and community communications.
 
-# #Schemas (Memberships, Events, Communications, Transactions)
+# #My backend structure will cover schemas for essentials aspects like memberships, events, communication 
+
+# #Schemas (Memberships, Events, Communications)
 
 # #MemberSchema 
 #     . Name {type: String, required}
@@ -14,12 +16,6 @@
 #     . description: {type: string}
 #     . date: {type: date, required}
 #     . location: string
-
-# #TransactionSchema
-#     . member: {type: mongoose.Schemas.Types.ObjectId, ref: 'Member'}
-#     . amount: {type: Number, required}
-#     . type: {type: string, enum: ['Membership card fee', 'Donation'], required}
-#     . timestamp: {type: Date, default: Date.now}
 
 # # CommunicationSchema
 #     . title: {type: string, required}
@@ -41,26 +37,31 @@
 #     . Update
 #     . Delete
 
-# # TransactionsRoutes
-#     . Post
-#     . Get
-#     . Update
-#     . Delete
-
 # #CommunicationsRoutes
 #     . Post
 #     . Get
 #     . Update
 #     . Delete
 
-# # Authentication
-#     . JWT
-#     . BCRYPT
+#Resources
 
-# #Controllers
-#     . MemberControllers
-#     . TransactionControllers
-                                                                                
+##User authentication (JWT-based)
+##Role-based access control (admin & members)
+##CRUD operations for events & announcements
+##Secure API endpoints
+##MongoDB database integration
+
+  ##Routes 
+
+#POST	/api/auth/signup	Register a new user
+#POST	/api/auth/login	Authenticate user
+#GET	/api/event	Get all events
+#POST	/api/event	Create a new event
+#PUT	/api/event/:id	Update an event
+#DELETE	/api/event/:id	Delete an event
+#GET	/api/comm	Get all announcements
+#POST	/api/comm	Create an announcement
+
 # #Middleware
 #     . Auth
 #     . AuthAdmin
